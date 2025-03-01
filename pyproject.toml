@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my_orm_library"
+version = "0.1.0"
+description = "A simple ORM library for Python"
+authors = [
+    { name = "csv666", email = "csv666devil@gmail.com" }
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pydantic>=2.10.6",
+    "aiomysql>=0.2.0",
+    "loguru>=0.7.3",
+    "inflection>=0.5.1"
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/my_orm_library"
