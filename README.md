@@ -2,13 +2,18 @@
 
 Асинхронная ORM библиотека для Python с поддержкой MySQL, построенная на базе `aiomysql` и `pydantic`.
 
+# Установка
+
+```
+pip install git+https://github.com/Jebkel/LaraOrm
+```
 
 # Быстрый старт
 ## Определение моделей
 ```python
 from datetime import datetime
 from typing import Optional
-from async_orm import Model
+from lara_orm import Model
 
 class User(Model):
     id: Optional[int] = None
