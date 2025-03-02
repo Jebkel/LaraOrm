@@ -1,12 +1,13 @@
 import asyncio
 from collections import defaultdict
 from datetime import datetime
+from typing import TypeVar, Generic, Optional, List, Any, Type, Dict, Callable
 
-from aiomysql import Pool, DictCursor, create_pool
-from pydantic import BaseModel, ValidationError, Json, Field
-from typing import TypeVar, Generic, Optional, List, Any, Type, Dict, Callable, ClassVar
 import inflection
+from aiomysql import Pool, DictCursor, create_pool
 from loguru import logger
+from pydantic import BaseModel, Field
+
 from exceptions import EventCancelledError, RelationshipError, ORMError, NotFoundError
 
 T = TypeVar('T', bound='Model')
@@ -20,9 +21,11 @@ class Relation:
         self.foreign_key = foreign_key
         self.local_key = local_key
 
+
 class HasMany(Relation):
     async def get(self, parent_id: Any) -> List['Model']:
         return await self.model.where(self.foreign_key, parent_id).get()
+
 
 class BelongsTo(Relation):
     async def get(self, foreign_id: Any) -> Optional['Model']:
@@ -44,7 +47,6 @@ class QueryBuilder(Generic[T]):
             raise ValueError("Invalid sorting direction. Use ASC/DESC")
         self._order_by.append((column, direction))
         return self
-
 
     def where(self, column: str, operator: Any, value: Any = None) -> 'QueryBuilder[T]':
         param_name = f"param_{len(self._params)}"
@@ -152,6 +154,7 @@ class QueryBuilder(Generic[T]):
 
         def with_relations(self, *relations: str) -> 'QueryBuilder[T]':
             self._relations = relations
+
         return self
 
     async def delete(self) -> int:
@@ -217,12 +220,12 @@ class QueryBuilder(Generic[T]):
                 setattr(parent, relation_name,
                         related_map.get(getattr(parent, relation.foreign_key)))
 
+
 class Model(BaseModel):
     _table_name: Optional[str] = ""
     pool: Optional[Pool] = None
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: Optional[datetime] = None
-
 
     def __init_subclass__(cls, **kwargs):
         if cls._table_name.default == "":
@@ -267,6 +270,7 @@ class Model(BaseModel):
         def decorator(callback: Callable):
             cls._get_events()[event].append(callback)
             return callback
+
         return decorator
 
     async def _trigger_before(self, event: str) -> bool:
