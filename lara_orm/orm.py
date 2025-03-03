@@ -8,7 +8,7 @@ from aiomysql import Pool, DictCursor, create_pool
 from loguru import logger
 from pydantic import BaseModel, Field
 
-from exceptions import EventCancelledError, RelationshipError, ORMError, NotFoundError
+from .exceptions import EventCancelledError, RelationshipError, ORMError, NotFoundError
 
 T = TypeVar('T', bound='Model')
 R = TypeVar('R', bound='Model')
@@ -248,6 +248,14 @@ class Model(BaseModel):
     @classmethod
     async def create_pool(cls, **kwargs) -> None:
         cls.pool = await create_pool(**kwargs)
+
+    @classmethod
+    async def close_pool(cls) -> None:
+        """Закрывает пул соединений с базой данных."""
+        if cls.pool:
+            cls.pool.close()
+            cls.pool = None
+            logger.debug(f"Connection pool for {cls.__name__} closed")
 
     @classmethod
     async def create(cls: Type[T], **data) -> T:
